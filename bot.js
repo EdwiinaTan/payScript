@@ -4,6 +4,14 @@ require("dotenv").config()
 
 puppeteer.use(StealthPlugin())
 
+async function getElement(row, element, text) {
+  const getElement = await row.$$(element)
+  if (getElement && getElement.length !== 0) {
+    const textElement = await getElement[0].evaluate((el) => el.textContent)
+    console.log(`${text} : ${textElement}`)
+  }
+}
+
 async function launcher() {
   const browser = await puppeteer.launch({
     headless: false,
@@ -23,44 +31,33 @@ async function launcher() {
   for (let i = 0; i < tracklistRows.length; i++) {
     const tracklistRow = tracklistRows[i]
 
-    const titleElement = await tracklistRow.$$(
-      ".Type__TypeElement-sc-goli3j-0.fZDcWX.t_yrXoUO3qGsJS4Y6iXX.standalone-ellipsis-one-line"
+    await getElement(
+      tracklistRow,
+      ".Type__TypeElement-sc-goli3j-0.fZDcWX.t_yrXoUO3qGsJS4Y6iXX.standalone-ellipsis-one-line",
+      "Titre"
     )
-    if (titleElement && titleElement.length !== 0) {
-      const text = await titleElement[0].evaluate((el) => el.textContent)
-      console.log(`Titre de l'élément ${i + 1}: ${text}`)
-    }
-
-    const artistElement = await tracklistRow.$$(
-      ".Type__TypeElement-sc-goli3j-0.bDHxRN.rq2VQ5mb9SDAFWbBIUIn.standalone-ellipsis-one-line > a"
+    await getElement(
+      tracklistRow,
+      ".Type__TypeElement-sc-goli3j-0.bDHxRN.rq2VQ5mb9SDAFWbBIUIn.standalone-ellipsis-one-line > a",
+      "Artiste"
     )
-    if (artistElement && artistElement.length !== 0) {
-      const text = await artistElement[0].evaluate((el) => el.textContent)
-      console.log(`Artiste de l'élément ${i + 1}: ${text}`)
-    }
-
-    const timeElement = await tracklistRow.$$(
-      ".Type__TypeElement-sc-goli3j-0.bDHxRN.Btg2qHSuepFGBG6X0yEN"
+    await getElement(
+      tracklistRow,
+      ".Type__TypeElement-sc-goli3j-0.bDHxRN.Btg2qHSuepFGBG6X0yEN",
+      "Time"
     )
-    if (timeElement && timeElement.length !== 0) {
-      const text = await timeElement[0].evaluate((el) => el.textContent)
-      console.log(`Temps de l'élément ${i + 1}: ${text}`)
-    }
-
-    const albumElement = await tracklistRow.$$(
-      ".Type__TypeElement-sc-goli3j-0.ieTwfQ > a"
+    await getElement(
+      tracklistRow,
+      ".Type__TypeElement-sc-goli3j-0.ieTwfQ > a",
+      "Album"
     )
-    if (albumElement && albumElement.length !== 0) {
-      const text = await albumElement[0].evaluate((el) => el.textContent)
-      console.log(`Album de l'élément ${i + 1}: ${text}`)
-    }
 
     const imageElement = await tracklistRow.$("img")
     if (imageElement) {
       const imageURL = await imageElement.evaluate((img) =>
         img.getAttribute("src")
       )
-      console.log(`URL de l'image pour l'élément ${i + 1}: ${imageURL}`)
+      console.log(`URL de l'image ${i + 1}: ${imageURL}`)
     }
   }
 }
