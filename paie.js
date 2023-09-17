@@ -4,6 +4,10 @@ require("dotenv").config()
 
 puppeteer.use(StealthPlugin())
 
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
 async function launcher() {
   const browser = await puppeteer.launch({
     headless: false,
@@ -19,15 +23,32 @@ async function launcher() {
     "https://drive.google.com/drive/u/1/folders/1sr3-8XLD9Dw0OSLLW2OCakV4CUp5xoRB"
   )
 
-  await page.waitForSelector('input[type="email"]')
+  await page.waitForSelector('input[type="email"]', { visible: true })
   await page.type('input[type="email"]', process.env.EMAIL)
   await page.click("#identifierNext")
+
+  // await page.waitForSelector('input[type="password"]', { visible: true })
+  // await page.type('input[type="password"]', process.env.PASSWORD)
+  // await page.click("#passwordNext")
+
+  wait(6000)
+
+  const elements = await page.$$eval(
+    '[aria-label="Autres actions"]',
+    (elements) => {
+      return elements.map((element) => element.textContent)
+    }
+  )
+
+  // Affichez les textes des éléments récupérés
+  elements.forEach((text, index) => {
+    console.log(`Élément ${index + 1}: ${text}`)
+  })
 
   // const cookies = await page.cookies()
   // await page.setCookie(...cookies)
 
   // GOOD
-  // await page.goto("https://open.spotify.com/playlist/7HuVjioagXVg5iot4VDePx")
   // await page.goto("https://music.youtube.com/")
   // await page.waitForSelector(
   //   '.WpHeLc.VfPpkd-mRLv6.VfPpkd-RLmnJb[aria-label="Sign in"]'
