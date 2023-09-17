@@ -29,17 +29,18 @@ async function launcher() {
   const tracklistRows = await page.$$('[data-testid="tracklist-row"]')
 
   for (let i = 0; i < tracklistRows.length; i++) {
+    //foreach -> all title/artist
     const tracklistRow = tracklistRows[i]
 
     await getElement(
       tracklistRow,
       ".Type__TypeElement-sc-goli3j-0.fZDcWX.t_yrXoUO3qGsJS4Y6iXX.standalone-ellipsis-one-line",
-      "Titre"
+      "Title"
     )
     await getElement(
       tracklistRow,
       ".Type__TypeElement-sc-goli3j-0.bDHxRN.rq2VQ5mb9SDAFWbBIUIn.standalone-ellipsis-one-line > a",
-      "Artiste"
+      "Artist"
     )
     await getElement(
       tracklistRow,
@@ -57,9 +58,10 @@ async function launcher() {
       const imageURL = await imageElement.evaluate((img) =>
         img.getAttribute("src")
       )
-      console.log(`URL de l'image ${i + 1}: ${imageURL}`)
+      console.log(`URL image ${i + 1}: ${imageURL}`)
     }
   }
+  await browser.close()
 }
 
 launcher()
