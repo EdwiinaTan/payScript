@@ -3,18 +3,11 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth")
 require("dotenv").config()
 
 puppeteer.use(StealthPlugin())
-
-async function getElement(row, element, text) {
-  const getElement = await row.$$(element)
-  if (getElement && getElement.length !== 0) {
-    const textElement = await getElement[0].evaluate((el) => el.textContent)
-    console.log(`${text} : ${textElement}`)
-  }
-}
+//https://pptr.dev/api/puppeteer.page.__
 
 async function launcher() {
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: "new", // false -> display chrome test
     args: [
       "--no-sandbox",
       "--disable-gpu",
@@ -25,7 +18,14 @@ async function launcher() {
   const page = await browser.newPage()
   await page.goto("https://open.spotify.com/playlist/7HuVjioagXVg5iot4VDePx")
 
-  //https://pptr.dev/api/puppeteer.page.__
+  async function getElement(row, element, text) {
+    const getElement = await row.$$(element)
+    if (getElement && getElement.length !== 0) {
+      const textElement = await getElement[0].evaluate((el) => el.textContent)
+      console.log(`${text} : ${textElement}`)
+    }
+  }
+
   const tracklistRows = await page.$$('[data-testid="tracklist-row"]')
 
   for (let i = 0; i < tracklistRows.length; i++) {
