@@ -48,6 +48,10 @@ async function getPlaylist() {
     }
   }
 
+  function test() {
+    console.log("testtetstetstes")
+  }
+
   await fetch(
     `https://www.googleapis.com/youtube/v3/playlists?mine=true&part=snippet&code=${secrets.code}&redirect_uri=${secrets.redirect_uri}&client_id=${secrets.client_id}&client_secret=${secrets.client_secret}&grant_type=authorization_code&scope=offline_access`,
     myInit
@@ -57,37 +61,36 @@ async function getPlaylist() {
       console.log("json", json)
 
       const cards = document.getElementById("cards")
-      cards.className = "cards"
+      cards.classList.add("cards")
 
       const card = document.createElement("div")
+
+      // card.addEventListener("click", function () {
+      //   window.location.href = "musics.html"
+      // })
 
       json.items.map((item) => {
         // title.className = "card"
         // title.innerHTML += item.snippet.title
-        // date.innerHTML += parseDate(item.snippet.publishedAt)
         // img.setAttribute("src", item.snippet.thumbnails.medium.url)
-        card.innerHTML += `
-        <div class="card">
+        card.innerHtml += `
+        <div class="card" onClick="test()">
           <div>
             <img src=${item.snippet.thumbnails.medium.url} alt="imgg" />
           </div>
           <div class="line">
-            <h1>${item.snippet.title}</h1>
-            <p>${parseDate(item.snippet.publishedAt)}</p>
+            <h2>${item.snippet.title}</h2>
+            <span>${parseDate(item.snippet.publishedAt)}</span>
           </div>
         </div>`
         // cards.appendChild(date)
         // cards.appendChild(img)
         cards.append(card)
       })
-      // const text = document.createTextNode(json.items[0].snippet.title)
-      // title.appendChild(text)
     })
 }
 
 window.onload = function launch() {
-  // const playlist = document.getElementById("container")
-
   getPlaylist()
   // getRefreshToken()
 }
