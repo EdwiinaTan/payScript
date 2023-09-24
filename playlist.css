@@ -1,0 +1,20 @@
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+}
+
+.line {
+  display: flex;
+  flex-direction: column;
+}
+
+.test: {
+  display: flex;
+}

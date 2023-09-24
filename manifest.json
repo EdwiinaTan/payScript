@@ -6,14 +6,5 @@
   "action": {
     "default_icon": "icon.png",
     "default_popup": "index.html"
-  },
-  "permissions": [
-    "https://developers.google.com/oauthplayground/"
-  ],
-  "content_scripts": [
-    {
-      "js": ["playlist.js"],
-      "type": "module"
-    }
-  ]
+  }
 }
