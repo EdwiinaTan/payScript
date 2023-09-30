@@ -8,7 +8,7 @@ async function generateAccessToken() {
   const requestBody = {
     client_id: secrets.client_id,
     client_secret: secrets.client_secret,
-    refresh_token: secrets.refreshToken,
+    refresh_token: secrets.refresh_token,
     grant_type: "refresh_token",
     access_type: "offline",
   }
