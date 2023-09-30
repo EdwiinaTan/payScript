@@ -1,13 +1,14 @@
 .cards {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
 }
 
 .card {
   display: flex;
   flex-direction: row;
   gap: 16px;
+  cursor: pointer;
 }
 
 .line {

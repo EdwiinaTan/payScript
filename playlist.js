@@ -1,35 +1,49 @@
 import { secrets } from "./secrets.js"
 
-let tokenGenerated
+let tokenGenerated = ""
 
-async function getRefreshToken() {
-  const tokenUrl1 =
-    "https://developers.google.com/oauthplayground/?code=4/0AfJohXnhG5a5sr6U4EpvX5-5TSrTH4B11sGNJ9Bz86JOQd1bsxkzSr4YwD29imKM-0lZqg&scope=https://www.googleapis.com/auth/youtube"
-  const tokenUrl2 = "https://developers.google.com/oauthplayground/"
+async function generateAccessToken() {
+  const tokenUrl = "https://oauth2.googleapis.com/token"
 
-  await fetch(tokenUrl1, {
-    method: "GET",
+  const requestBody = {
+    client_id: secrets.client_id,
+    client_secret: secrets.client_secret,
+    refresh_token: secrets.refreshToken,
+    grant_type: "refresh_token",
+    access_type: "offline",
+  }
+
+  const response = await fetch(tokenUrl, {
+    method: "POST",
     headers: {
-      Authorization: `Bearer ${secrets.token}`,
-      Accept: "application/json",
       "Content-Type": "application/x-www-form-urlencoded",
     },
-    mode: "cors",
-    cache: "default",
-  }).then((res) => console.log("resss", res.json()))
+    body: new URLSearchParams(requestBody),
+  })
+
+  if (response.ok) {
+    const data = await response.json()
+    tokenGenerated = data.access_token
+    console.log("Access token:", data)
+    console.log("aaaa", tokenGenerated)
+  } else {
+    console.error(
+      "Failed to obtain access token:",
+      response.status,
+      response.statusText
+    )
+  }
 }
 
 async function getPlaylist() {
+  await generateAccessToken()
+
   const myInit = {
     method: "GET",
     headers: {
-      Authorization: `Bearer ${secrets.token}`,
+      Authorization: `Bearer ${tokenGenerated}`,
       Accept: "application/json",
       "Content-Type": "application/x-www-form-urlencoded",
-      // "Access-Control-Allow-Origin": "*",
-      // "Access-Control-Allow-Credentials": true,
-      // "Access-Control-Allow-Headers": "Content-Type",
-      // "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     },
     mode: "cors",
     cache: "default",
@@ -48,10 +62,6 @@ async function getPlaylist() {
     }
   }
 
-  function test() {
-    console.log("testtetstetstes")
-  }
-
   await fetch(
     `https://www.googleapis.com/youtube/v3/playlists?mine=true&part=snippet&code=${secrets.code}&redirect_uri=${secrets.redirect_uri}&client_id=${secrets.client_id}&client_secret=${secrets.client_secret}&grant_type=authorization_code&scope=offline_access`,
     myInit
@@ -60,37 +70,40 @@ async function getPlaylist() {
     .then((json) => {
       console.log("json", json)
 
-      const cards = document.getElementById("cards")
-      cards.classList.add("cards")
+      const cardContainer = document.getElementById("cardContainer")
 
-      const card = document.createElement("div")
-
-      // card.addEventListener("click", function () {
-      //   window.location.href = "musics.html"
-      // })
+      const clickModalImg = (clickImgModal, id) => {
+        clickImgModal.addEventListener("click", () => {
+          console.log("iddddd", id)
+        })
+      }
 
       json.items.map((item) => {
-        // title.className = "card"
         // title.innerHTML += item.snippet.title
         // img.setAttribute("src", item.snippet.thumbnails.medium.url)
-        card.innerHtml += `
-        <div class="card" onClick="test()">
-          <div>
-            <img src=${item.snippet.thumbnails.medium.url} alt="imgg" />
+        const card = document.createElement("div")
+        card.classList.add("cards")
+
+        card.innerHTML += `
+          <div class="card">
+            <div >
+              <img src=${item.snippet.thumbnails.medium.url} alt="imgg" />
+            </div>
+            <div class="line">
+              <h2>${item.snippet.title}</h2>
+              <span>${parseDate(item.snippet.publishedAt)}</span>
+            </div>
           </div>
-          <div class="line">
-            <h2>${item.snippet.title}</h2>
-            <span>${parseDate(item.snippet.publishedAt)}</span>
-          </div>
-        </div>`
-        // cards.appendChild(date)
-        // cards.appendChild(img)
-        cards.append(card)
+        `
+
+        cardContainer.appendChild(card)
+
+        let handleClickCard = card.querySelector(`.card`)
+        clickModalImg(handleClickCard, item.id)
       })
     })
 }
 
 window.onload = function launch() {
   getPlaylist()
-  // getRefreshToken()
 }
