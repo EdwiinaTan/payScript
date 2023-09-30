@@ -1,5 +1,10 @@
 import { secrets } from "./secrets.js"
 
+const urlParams = new URLSearchParams(window.location.search)
+const id = urlParams.get("id") // idplaylist
+
+console.log("my, param", id)
+
 let tokenGenerated = ""
 
 async function generateAccessToken() {
@@ -35,8 +40,15 @@ async function generateAccessToken() {
   }
 }
 
-async function getPlaylist() {
+async function renderMusics() {
   await generateAccessToken()
+
+  const btn = document.querySelector(".btn")
+
+  btn.addEventListener("click", () => {
+    console.log("aaa")
+    window.location.href = "index.html"
+  })
 
   const myInit = {
     method: "GET",
@@ -48,6 +60,8 @@ async function getPlaylist() {
     mode: "cors",
     cache: "default",
   }
+
+  const cardContainer = document.getElementById("cardContainer")
 
   function parseDate(date) {
     const regex = /^(\d{4})-(\d{2})-(\d{2})T/
@@ -63,24 +77,13 @@ async function getPlaylist() {
   }
 
   await fetch(
-    `https://www.googleapis.com/youtube/v3/playlists?mine=true&part=snippet&code=${secrets.code}&redirect_uri=${secrets.redirect_uri}&client_id=${secrets.client_id}&client_secret=${secrets.client_secret}&grant_type=authorization_code&scope=offline_access`,
+    `https://www.googleapis.com/youtube/v3/playlistItems?mine=true&part=snippet&code=${secrets.code}&redirect_uri=${secrets.redirect_uri}&client_id=${secrets.client_id}&client_secret=${secrets.client_secret}&grant_type=authorization_code&scope=offline_access&playlistId=${id}`,
     myInit
   )
     .then((res) => res.json())
-    .then((json) => {
-      console.log("json", json)
-      const cardContainer = document.getElementById("cardContainer")
-
-      const clickModalImg = (clickImgModal, id) => {
-        clickImgModal.addEventListener("click", () => {
-          window.location.href = `music.html?id=${id}`
-          console.log("iddddd", id)
-        })
-      }
-
-      json.items.map((item) => {
-        // title.innerHTML += item.snippet.title
-        // img.setAttribute("src", item.snippet.thumbnails.medium.url)
+    .then((res) => {
+      res.items.map((item) => {
+        console.log("res", item)
         const card = document.createElement("div")
         card.classList.add("cards")
 
@@ -99,13 +102,10 @@ async function getPlaylist() {
         `
 
         cardContainer.appendChild(card)
-
-        let handleClickCard = card.querySelector(`.card`)
-        clickModalImg(handleClickCard, item.id)
       })
     })
 }
 
 window.onload = function launch() {
-  getPlaylist()
+  renderMusics()
 }
