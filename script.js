@@ -58,3 +58,20 @@ export const parseDate = (date) => {
     return formattedDate
   }
 }
+
+export const createCard = (spinnet) => {
+  const { thumbnails, title, publishedAt } = spinnet
+  return `
+    <div class="card">
+      <div >
+        <img src=${
+          thumbnails.medium.url
+        } alt="playlist musid img" class="card_img" />
+      </div>
+      <div class="line">
+        <span>${title}</span>
+        <span>${parseDate(publishedAt)}</span>
+      </div>
+    </div>
+  `
+}
