@@ -1,47 +1,13 @@
+import { createInit, generateAccessToken } from "./script.js"
 import { secrets } from "./secrets.js"
 
 const urlParams = new URLSearchParams(window.location.search)
 const id = urlParams.get("id") // idplaylist
 
-console.log("my, param", id)
-
 let tokenGenerated = ""
 
-async function generateAccessToken() {
-  const tokenUrl = "https://oauth2.googleapis.com/token"
-
-  const requestBody = {
-    client_id: secrets.client_id,
-    client_secret: secrets.client_secret,
-    refresh_token: secrets.refresh_token,
-    grant_type: "refresh_token",
-    access_type: "offline",
-  }
-
-  const response = await fetch(tokenUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams(requestBody),
-  })
-
-  if (response.ok) {
-    const data = await response.json()
-    tokenGenerated = data.access_token
-    console.log("Access token:", data)
-    console.log("aaaa", tokenGenerated)
-  } else {
-    console.error(
-      "Failed to obtain access token:",
-      response.status,
-      response.statusText
-    )
-  }
-}
-
 async function renderMusics() {
-  await generateAccessToken()
+  const tokenGenerateded = await generateAccessToken(tokenGenerated)
 
   const btn = document.querySelector(".btn")
 
@@ -49,17 +15,6 @@ async function renderMusics() {
     console.log("aaa")
     window.location.href = "index.html"
   })
-
-  const myInit = {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${tokenGenerated}`,
-      Accept: "application/json",
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    mode: "cors",
-    cache: "default",
-  }
 
   const cardContainer = document.getElementById("cardContainer")
 
@@ -78,7 +33,7 @@ async function renderMusics() {
 
   await fetch(
     `https://www.googleapis.com/youtube/v3/playlistItems?mine=true&part=snippet&code=${secrets.code}&redirect_uri=${secrets.redirect_uri}&client_id=${secrets.client_id}&client_secret=${secrets.client_secret}&grant_type=authorization_code&scope=offline_access&playlistId=${id}`,
-    myInit
+    createInit(tokenGenerateded)
   )
     .then((res) => res.json())
     .then((res) => {
